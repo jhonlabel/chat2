@@ -10,45 +10,44 @@ namespace ConsoleServer
 {
     class Program
     {
-        private System.Collections.Generic.List<ClientManager> clients;
+        private List<ClientManager> clients; // usa System.Collections.Generic
         private BackgroundWorker bwListener;
         private Socket listenerSocket;
         private IPAddress serverIP;
         private int serverPort;
-        
-        /// <summary>
-        /// Start the console server.
-        /// </summary>
-        /// <param name="args">These are optional arguments.Pass the local ip address of the server as the first argument and the local port as the second argument.</param>
-        static void Main(string [] args)
+
+        static void Main(string [] args) // acepta argumentos
         {
-            Program progDomain = new Program();
-            progDomain.clients = new List<ClientManager>();
+            Program progDomain = new Program(); // ejecuta la clase
+            progDomain.clients = new List<ClientManager>(); // crea una lista para los clientes
 
             if ( args.Length == 0 )
             {
                 progDomain.serverPort = 8000;
-                progDomain.serverIP = IPAddress.Any;
+                progDomain.serverIP = IPAddress.Any; // Utiliza todas las IPs de las interfaces de red
             }
-            if ( args.Length == 1 )
+            if ( args.Length == 1) // si se introduce un argumento, utiliza la IP introducida
             {
                 progDomain.serverIP = IPAddress.Parse(args [0]);
                 progDomain.serverPort = 8000;
             }
-            if ( args.Length == 2 )
+            if ( args.Length == 2 ) // si se introduce dos argumentos, utiliza la IP y el puerto
             {
                 progDomain.serverIP = IPAddress.Parse(args [0]);
                 progDomain.serverPort = int.Parse(args [1]);
             }
 
-            progDomain.bwListener = new BackgroundWorker();
-            progDomain.bwListener.WorkerSupportsCancellation = true;
-            progDomain.bwListener.DoWork += new DoWorkEventHandler(progDomain.StartToListen);
-            progDomain.bwListener.RunWorkerAsync();
-            
+            // Por hacer: arreglar por si se introducen 3 argumentos, no falle
+
+            progDomain.bwListener = new BackgroundWorker(); // ejecuta la clase BackgroundWorker. Permite ejecutar métodos en segundo plano
+            progDomain.bwListener.WorkerSupportsCancellation = true; // se establece a true para que BackgroundWorker acepte CancelAsync -> para el método que esté ejecutado en segundo plano
+            progDomain.bwListener.RunWorkerAsync(); // envía petición para poder ejecutar el método en segundo plano
+            progDomain.bwListener.DoWork += new DoWorkEventHandler(progDomain.StartToListen); // una vez que la petición se he enviado, esto ejecuta StartToListen en segundo plano
+
+
             Console.WriteLine("*** Listening on port {0}{1}{2} started.Press ENTER to shutdown server. ***\n",progDomain.serverIP.ToString(),":",progDomain.serverPort.ToString());
             
-            Console.ReadLine();
+            Console.ReadLine(); // en pausa; si se presiona enter, la aplicación continúa
 
             progDomain.DisconnectServer();
         }
