@@ -52,19 +52,19 @@ namespace ConsoleServer
             progDomain.DisconnectServer();
         }
 
-        private void StartToListen(object sender , DoWorkEventArgs e)
+        private void StartToListen(object sender , DoWorkEventArgs e) // controlar evento DoWork
         {
-            this.listenerSocket = new Socket(AddressFamily.InterNetwork , SocketType.Stream , ProtocolType.Tcp);
-            this.listenerSocket.Bind(new IPEndPoint(this.serverIP , this.serverPort));
-            this.listenerSocket.Listen(200);
-            while ( true )
-                this.CreateNewClientManager(this.listenerSocket.Accept());
+            this.listenerSocket = new Socket(AddressFamily.InterNetwork , SocketType.Stream , ProtocolType.Tcp); // crea un socket para enviar datos a través de TCP
+            this.listenerSocket.Bind(new IPEndPoint(this.serverIP , this.serverPort)); // asocia el socket con la IP : puerto
+            this.listenerSocket.Listen(200); // pone el socket en modo escucha
+            while ( true ) // mientras no haya sucedido ningun error / exception ???
+                this.CreateNewClientManager(this.listenerSocket.Accept()); // crea la conexión al socket
         }
-        private void CreateNewClientManager(Socket socket)
+        private void CreateNewClientManager(Socket socket) // manejar a los clientes
         {
             ClientManager newClientManager = new ClientManager(socket);
-            newClientManager.CommandReceived += new CommandReceivedEventHandler(CommandReceived);
-            newClientManager.Disconnected += new DisconnectedEventHandler(ClientDisconnected);
+            newClientManager.CommandReceived += new CommandReceivedEventHandler(CommandReceived); // eje
+            newClientManager.Disconnected += new DisconnectedEventHandler(ClientDisconnected); // disconecta al cliente
             this.CheckForAbnormalDC(newClientManager);
             this.clients.Add(newClientManager);
             this.UpdateConsole("Connected." , newClientManager.IP , newClientManager.Port);
@@ -204,7 +204,7 @@ namespace ConsoleServer
         }
         private void UpdateConsole(string status , IPAddress IP , int port)
         {
-            Console.WriteLine("Client {0}{1}{2} has been {3} ( {4}|{5} )" , IP.ToString(),":" , port.ToString() , status,DateTime.Now.ToShortDateString(),DateTime.Now.ToLongTimeString());
+            Console.WriteLine("Client {0}{1}{2} has been {3} ( {4}|{5} {6} )" , IP.ToString(),":" , port.ToString() , status,DateTime.Now.ToShortDateString(),DateTime.Now.ToLongTimeString(), "  IP Internet: " , IP.Address.ToString());
         }
         public void DisconnectServer()
         {
